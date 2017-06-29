@@ -1,0 +1,14 @@
+You've learned a lot about web development so far. I want you to take a moment to write down your thoughts about web development here. Answer the following questions:
+  * What new skills have you learned?
+  * What has been easy?
+  * What has been difficult?
+  * How have you used the problem solving strategies from the first project to overcome challenges so far?
+
+---
+
+Your response goes here!
+
+* I learned how to look up html tags via MDN, https://developer.mozilla.org/en-US/docs/Web/HTML/Element.
+* All tags in this exercise are listed on the MDN docs.
+* Need to make sure I am not missing anything.
+* Yes. I did not use Google or Stackover flow for this exercise but I looked up MDN.
