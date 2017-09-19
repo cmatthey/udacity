@@ -1,5 +1,5 @@
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: Lato, sans-serif;
   color: #2d3c49;
   font-weight: 300;
 }
@@ -17,11 +17,11 @@ body {
 }
 
 [class*="fontelico-"]:before {
-  font-family: 'fontelico', sans-serif;
+  font-family: fontelico, sans-serif;
 }
 
 [class*="zocial-"]:before {
-  font-family: 'zocial', sans-serif;
+  font-family: zocial, sans-serif;
 }
 
 .logo {
@@ -31,7 +31,7 @@ body {
 }
 
 .statement {
-  font-family: 'Sedgwick Ave Display', cursive;
+  font-family: "Sedgwick Ave Display", cursive;
   font-weight: bold;
   font-size: 100px;
   text-align: center;
@@ -40,15 +40,13 @@ body {
 .project {
   font-weight: bold;
   font-size: 160px;
-  color: #ffffff;
+  color: #fff;
   background: #7d97ad;
 }
 
-/* by rainbowcoding.com: https://rainbowcoding.com/2011/12/02/how-to-create-rainbow-text-in-html-css-javascript/*/
-.rainbow {
-  background-image: -webkit-gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
-  background-image: gradient( linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22) );
-  color:transparent;
+.rainbow_new {
+  background-image: linear-gradient(90deg, red, orange, yellow, lime, aqua, blue, purple);
+  color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
 }
