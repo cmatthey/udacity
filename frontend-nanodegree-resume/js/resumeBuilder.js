@@ -96,7 +96,7 @@ bio.display = function() {
   $("#topContacts").append(formattedGithub);
   $("#topContacts").append(formattedSkype);
   $("#topContacts").append(formattedLocation);
-}
+};
 
 bio.display();
 
@@ -114,7 +114,7 @@ work.display = function() {
       }
     );
   }
-}
+};
 
 work.display();
 
@@ -160,7 +160,7 @@ education.display = function() {
       }
     );
   }
-}
+};
 education.display();
 
 $("#main").append(internationalizeButton);
@@ -172,7 +172,7 @@ function locationizer(work_obj) {
       locationArray.push(job.location);
     }
   );
-  return locationArray
+  return locationArray;
 }
 
 function inName(name) {
@@ -186,6 +186,6 @@ function inName(name) {
 }
 
 function enableMap() {
-  $("#mapDiv").append(googleMap)
+  $("#mapDiv").append(googleMap);
 }
 enableMap();
