@@ -104,10 +104,7 @@ bio.display = function() {
   var formattedGithub = HTMLgithub.replace(data, bio.contacts.github);
   var formattedLocation = HTMLlocation.replace(data, bio.contacts.location);
   var formattedSkype = HTMLcontactGeneric.replace("%contact%", "skype").replace(data, bio.contacts.skype);
-  $("#topContacts").append(formattedEmail);
-  $("#topContacts").append(formattedGithub);
-  $("#topContacts").append(formattedSkype);
-  $("#topContacts").append(formattedLocation);
+  $("#topContacts").append(formattedEmail + formattedGithub + formattedSkype + formattedLocation);
   $("#footerContacts").append(formattedEmail);
 };
 
