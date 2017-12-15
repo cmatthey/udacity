@@ -7,3 +7,6 @@ In this game there are a Player and Enemies (Bugs). The goal of the player is to
 ![Frogger Game](https://d17h27t6h515a5.cloudfront.net/topher/2017/June/5931c951_frogger/frogger.png)
 
 ## How to play
+* Press arrow key, Up, Right, Down, Left to move the Player to the correspondent direction
+* Once Player reaches Water, the top row, Player won.
+* Enemy bugs move in different speed. If Player collide with a Enemy bug, Player moves back to the start square.

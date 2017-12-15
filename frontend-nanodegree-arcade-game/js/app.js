@@ -47,11 +47,11 @@ var Player = function() {
 };
 
 Player.prototype.update = function() {
-    if (player.y == 0) {
+    if (this.y == 0) {
         console.log("you won");
         this.startSquare();
         allEnemies.forEach(function(enemy){
-            enemy.speed = 0;
+            enemy.x = -101;
         });
     }
 };
