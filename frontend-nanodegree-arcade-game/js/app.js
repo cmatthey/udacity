@@ -1,3 +1,10 @@
+var Persona = function(sprite, x, y) {
+    this.sprite = sprite;
+    Resources.load(this.sprite);
+    this.x = x;
+    this.y = y;
+}
+
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -5,15 +12,14 @@ var Enemy = function() {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-    Resources.load(this.sprite);
-    this.x = 0 * 101;
-    this.y = (Math.floor(Math.random() * 3) + 1) * 83;
+    Persona.call(this, 'images/enemy-bug.png', 0 * 101, (Math.floor(Math.random() * 3) + 1) * 83);
     this.speed = Math.random();
 };
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
+Enemy.prototype = Object.create(Persona.prototype);
+
 Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
@@ -22,8 +28,8 @@ Enemy.prototype.update = function(dt) {
     if (this.x > 505) {
         this.x = 0;
     }
-    console.log("Enemy x, y " + this.x + ", " + this.y);
-    console.log("player x, y " + player.x + ", " + player.y);
+    // console.log("Enemy x, y " + this.x + ", " + this.y);
+    // console.log("player x, y " + player.x + ", " + player.y);
     if ((this.x + 101 >= player.x && this.x <= player.x)
         && this.y == player.y) {
         console.log("bang");
@@ -41,10 +47,11 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
-    this.sprite = 'images/char-pink-girl.png';
-    Resources.load(this.sprite);
+    Persona.call(this, 'images/char-pink-girl.png', 2 * 101, 5 * 83);
     this.startSquare();
 };
+
+Player.prototype = Object.create(Persona.prototype);
 
 Player.prototype.update = function() {
     if (this.y == 0) {
@@ -107,7 +114,6 @@ Player.prototype.startSquare = function() {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-// TODO: add more then 1 Enemy
 var allEnemies = [];
 var numOfEnemies = 3;
 for (var i=0; i<numOfEnemies; i++) {
