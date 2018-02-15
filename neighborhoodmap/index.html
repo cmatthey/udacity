@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="css/main.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="options-box">
+        <h1>Elementary School nearby</h1>
+        <div>
+          <input id="show-listings" type="button" value="Show Listings">
+          <input id="hide-listings" type="button" value="Hide Listings">
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <script>
+      var map;
+      var markers = [];
+      var locations = [
+        {title: 'R.I. Meyerholz Elementary School', location: {lat: 37.3064996, lng: -122.0286182}},
+        {title: 'Eaton Elementary School', location: {lat: 37.3150976, lng: -122.0283705}},
+        {title: 'John Muir Elementary School', location: {lat: 37.2999103, lng: -122.0547888}},
+        {title: 'William Faria Elementary School', location: {lat: 37.3166988, lng: -122.0353406}},
+        {title: 'Nelson S. Dilworth Elementary School', location: {lat: 37.3064309, lng: -122.0102763}},
+        {title: 'Sedgwick Elementary School', location: {lat: 37.3154064, lng: -122.0107286}}
+      ];
+      var rainbowLatLng = {lat: 37.3083685, lng: -122.0316045};
+      var rainbowLocation = {title: 'Rainbow Garden Bilingual Learning Center', location: {lat: 37.3083685, lng: -122.0316045}};
+      function initMap() {
+        var styles = [
+          {
+            featureType: 'water',
+            stylers: [
+              { color: '#19a0d8' }
+            ]
+          },{
+            featureType: 'administrative',
+            elementType: 'labels.text.stroke',
+            stylers: [
+              { color: '#ffffff' },
+              { weight: 6 }
+            ]
+          },{
+            featureType: 'administrative',
+            elementType: 'labels.text.fill',
+            stylers: [
+              { color: '#e85113' }
+            ]
+          },{
+            featureType: 'road.highway',
+            elementType: 'geometry.stroke',
+            stylers: [
+              { color: '#efe9e4' },
+              { lightness: -40 }
+            ]
+          },{
+            featureType: 'transit.station',
+            stylers: [
+              { weight: 9 },
+              { hue: '#e85113' }
+            ]
+          },{
+            featureType: 'road.highway',
+            elementType: 'labels.icon',
+            stylers: [
+              { visibility: 'off' }
+            ]
+          },{
+            featureType: 'water',
+            elementType: 'labels.text.stroke',
+            stylers: [
+              { lightness: 100 }
+            ]
+          },{
+            featureType: 'water',
+            elementType: 'labels.text.fill',
+            stylers: [
+              { lightness: -100 }
+            ]
+          },{
+            featureType: 'poi',
+            elementType: 'geometry',
+            stylers: [
+              { visibility: 'on' },
+              { color: '#f0e4d3' }
+            ]
+          },{
+            featureType: 'road.highway',
+            elementType: 'geometry.fill',
+            stylers: [
+              { color: '#efe9e4' },
+              { lightness: -25 }
+            ]
+          }
+        ];
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: rainbowLatLng,
+          zoom: 13,
+          styles: styles,
+          mapTypeControl: false
+        });
+        var largeInfowindow = new google.maps.InfoWindow();
+        var defaultIcon = makeMarkerIcon('0091ff');
+        var highlightedIcon = makeMarkerIcon('00cc00');
+        for (var i = 0; i < locations.length; i++) {
+          var position = locations[i].location;
+          var title = locations[i].title;
+          var marker = new google.maps.Marker({
+            map: map,
+            position: position,
+            title: title,
+            animation: google.maps.Animation.DROP,
+            icon: defaultIcon,
+            id: i
+          });
+          markers.push(marker);
+          marker.addListener('click', function() {
+            populateInfoWindow(this, largeInfowindow);
+          });
+          marker.addListener('mouseover', function() {
+            this.setIcon(highlightedIcon);
+          });
+          marker.addListener('mouseout', function() {
+            this.setIcon(defaultIcon);
+          });
+        }
+        document.getElementById('show-listings').addEventListener('click', showListings);
+        document.getElementById('hide-listings').addEventListener('click', hideListings);
+
+        var rainbowDefaultIcon = makeMarkerIcon('ff0000');
+        var rainbowHighlightedIcon = makeMarkerIcon('FFFF24');
+        var rainbowMarker = new google.maps.Marker({
+          map: map,
+          position: rainbowLocation.location,
+          title: rainbowLocation.title,
+          animation: google.maps.Animation.DROP,
+          icon: rainbowDefaultIcon,
+        });
+        rainbowMarker.addListener('click', function() {
+          populateInfoWindow(this, largeInfowindow);
+        });
+        rainbowMarker.addListener('mouseover', function() {
+          this.setIcon(rainbowHighlightedIcon);
+        });
+        rainbowMarker.addListener('mouseout', function() {
+          this.setIcon(rainbowDefaultIcon);
+        });
+      }
+
+      function populateInfoWindow(marker, infowindow) {
+        if (infowindow.marker != marker) {
+          infowindow.marker = marker;
+          infowindow.setContent('<div>' + marker.title + '</div>');
+          infowindow.open(map, marker);
+          infowindow.addListener('closeclick',function(){
+            infowindow.setMarker = null;
+          });
+        }
+      }
+
+      function showListings() {
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+          bounds.extend(markers[i].position);
+        }
+        map.fitBounds(bounds);
+      }
+
+      function hideListings() {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+      }
+
+      function makeMarkerIcon(markerColor) {
+        var markerImage = new google.maps.MarkerImage(
+          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+          '|40|_|%E2%80%A2',
+          new google.maps.Size(21, 34),
+          new google.maps.Point(0, 0),
+          new google.maps.Point(10, 34),
+          new google.maps.Size(21,34));
+        return markerImage;
+      }
+    </script>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpgEZ4iexILdostcaViVlyZg8ebFc0ra8&v=3&callback=initMap">
+    </script>
+
+  </body>
+</html>
