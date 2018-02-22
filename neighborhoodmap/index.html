@@ -15,7 +15,7 @@
   <!-- <div class="container"> -->
     <!-- <div class="row">
       <div class=".col-md-3"> -->
-        <select data-bind="options: categories, optionsText: 'category', value: selectedCategory, selectedOptions: showMarkers"></select>
+        <select data-bind="options: categories, optionsText: 'category', value: selectedCategory, event: {change: showMarkers}" id="category"></select>
         <div data-bind="with: selectedCategory">
           <div data-bind="text: 'category'"></div>
           <ul data-bind="foreach: POIs">

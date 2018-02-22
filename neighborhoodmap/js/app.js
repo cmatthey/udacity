@@ -19,6 +19,15 @@ var setNeighborhoodMarker = function(title, lat, lng) {
   return marker;
 };
 
+var addMarkers = function(marker) {
+  markers.push(marker);
+};
+
+var removeMarkers = function() {
+  setMap(null);
+  markers = [];
+};
+
 var locations = function() {};
 locations.schools = [
   {title: 'R.I. Meyerholz Elementary School', location: {lat: 37.3064996, lng: -122.0286182}},
@@ -48,9 +57,7 @@ var initMap = function() {
     zoom: 13,
     center: latlng
   };
-  console.log('trying to init map');
   map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  console.log('trying to init map after');
 };
 
 var ViewModel = function() {
@@ -102,9 +109,15 @@ var POI = function(title, lat, lng) {
       position: new google.maps.LatLng(lat, lng),
       animation: google.maps.Animation.DROP
     });
-    console.log('title: ' + title);
-    console.log('lat: ' + lat);
-    console.log('lng: ' + lng);
+    var myCategory = $('#category option:selected').text();
+    var myLocations = locations[myCategory];
+    removeMarkers();
+    myLocations.forEach(function(item) {
+      var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
+      addMarkers(markerToBeAdded);
+    });
+    setMap(map);
+    console.log('markers.length: ' + markers.length);
   }
 };
 
