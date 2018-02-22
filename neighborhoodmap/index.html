@@ -1,353 +1,46 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link href="css/main.css" rel="stylesheet" type="text/css" />
-    <script type='text/javascript' src='bower_components/knockout/dist/knockout.js'></script>
-  </head>
-  <body>
-    <div class="container">
-      <div class="options-box">
-        <h1>Schools, groceries, and parks in my neighborhood</h1>
-        <!-- <div>
-          <input id="show-listings" type="button" value="Show Listings">
-          <input id="hide-listings" type="button" value="Hide Listings">
-          <hr>
-          <span class="text"> Draw a shape to search within it for schools!</span>
-          <input id="toggle-drawing"  type="button" value="Drawing Tools">
-        </div>
-        <hr>
-        <div>
-          <input id="zoom-to-area-text" type="text" placeholder="Enter your favorite area!">
-          <input id="zoom-to-area" type="button" value="Zoom">
-        </div>
-        <hr> -->
-        <div>
-          <span class="text">Find schools, groceries, and parks near by</span>
-          <select data-bind="options: categories, optionsText: 'category', value: selectedCategory"></select>
-        </div>
-        <hr />
+<html lang="en">
+
+<head>
+  <title>My neighorhood</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+  <!-- <div class="container"> -->
+    <!-- <div class="row">
+      <div class=".col-md-3"> -->
+        <select data-bind="options: categories, optionsText: 'category', value: selectedCategory, selectedOptions: showMarkers"></select>
         <div data-bind="with: selectedCategory">
           <div data-bind="text: 'category'"></div>
-          <ul data-bind="foreach: titles">
+          <ul data-bind="foreach: POIs">
             <li>
-              <span data-bind="text: $data"></span>
+              <button>
+                <span data-bind="text: title, click: show"></span>
+              </button>
             </li>
           </ul>
         </div>
-      </div>
+      <!-- </div> -->
       <div id="map"></div>
-    </div>
+    <!-- </div> -->
+  <!-- </div> -->
 
-    <script>
-      var map;
-      var markers = [];
-      var polygon = null;
-      var locations = function() {};
-      locations.schools = [
-        {title: 'R.I. Meyerholz Elementary School', location: {lat: 37.3064996, lng: -122.0286182}},
-        {title: 'Eaton Elementary School', location: {lat: 37.3150976, lng: -122.0283705}},
-        {title: 'John Muir Elementary School', location: {lat: 37.2999103, lng: -122.0547888}},
-        {title: 'William Faria Elementary School', location: {lat: 37.3166988, lng: -122.0353406}},
-        {title: 'Nelson S. Dilworth Elementary School', location: {lat: 37.3064309, lng: -122.0102763}},
-        {title: 'Sedgwick Elementary School', location: {lat: 37.3154064, lng: -122.0107286}}
-      ];
-      locations.groceries = [
-        {title: 'Trader Joe\'s', location: {lat: 37.3220587, lng: -122.1035739}},
-        {title: '99 Range Market', location: {lat: 37.32191, lng: -122.0510434}},
-        {title: 'Sprouts farmers market', location: {lat: 37.3218729, lng: -122.0357225}}
-      ];
-      locations.parks = [
-        {title: 'Jollyman Park', location: {lat: 37.3102855, lng: -122.0418191}},
-        {title: 'Wilson Park', location: {lat: 37.3190182, lng: -122.0223567}}
-      ];
-      var centerLatLng = {lat: 37.3083685, lng: -122.0316045};
-      var centerLocation = {title: 'Rainbow Garden Bilingual Learning Center', location: {lat: 37.3083685, lng: -122.0316045}};
-      function initMap() {
-        var styles = [
-          {
-            featureType: 'water',
-            stylers: [
-              { color: '#19a0d8' }
-            ]
-          },{
-            featureType: 'administrative',
-            elementType: 'labels.text.stroke',
-            stylers: [
-              { color: '#ffffff' },
-              { weight: 6 }
-            ]
-          },{
-            featureType: 'administrative',
-            elementType: 'labels.text.fill',
-            stylers: [
-              { color: '#e85113' }
-            ]
-          },{
-            featureType: 'road.highway',
-            elementType: 'geometry.stroke',
-            stylers: [
-              { color: '#efe9e4' },
-              { lightness: -40 }
-            ]
-          },{
-            featureType: 'transit.station',
-            stylers: [
-              { weight: 9 },
-              { hue: '#e85113' }
-            ]
-          },{
-            featureType: 'road.highway',
-            elementType: 'labels.icon',
-            stylers: [
-              { visibility: 'off' }
-            ]
-          },{
-            featureType: 'water',
-            elementType: 'labels.text.stroke',
-            stylers: [
-              { lightness: 100 }
-            ]
-          },{
-            featureType: 'water',
-            elementType: 'labels.text.fill',
-            stylers: [
-              { lightness: -100 }
-            ]
-          },{
-            featureType: 'poi',
-            elementType: 'geometry',
-            stylers: [
-              { visibility: 'on' },
-              { color: '#f0e4d3' }
-            ]
-          },{
-            featureType: 'road.highway',
-            elementType: 'geometry.fill',
-            stylers: [
-              { color: '#efe9e4' },
-              { lightness: -25 }
-            ]
-          }
-        ];
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: centerLatLng,
-          zoom: 13,
-          styles: styles,
-          mapTypeControl: false
-        });
-        var largeInfowindow = new google.maps.InfoWindow();
-        var drawingManager = new google.maps.drawing.DrawingManager({
-          drawingMode: google.maps.drawing.OverlayType.POLYGON,
-          drawingControl: true,
-          drawingControlOptions: {
-            position: google.maps.ControlPosition.TOP_LEFT,
-            drawingModes: [
-              google.maps.drawing.OverlayType.POLYGON
-            ]
-          }
-        });
-        var defaultIcon = makeMarkerIcon('0091ff');
-        var highlightedIcon = makeMarkerIcon('00cc00');
-        for (var i = 0; i < locations.schools.length; i++) {
-          var position = locations.schools[i].location;
-          var title = locations.schools[i].title;
-          var marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            icon: defaultIcon,
-            id: i
-          });
-          markers.push(marker);
-          marker.addListener('click', function() {
-            populateInfoWindow(this, largeInfowindow);
-          });
-          marker.addListener('mouseover', function() {
-            this.setIcon(highlightedIcon);
-          });
-          marker.addListener('mouseout', function() {
-            this.setIcon(defaultIcon);
-          });
-        }
-        document.getElementById('show-listings').addEventListener('click', showListings);
-        document.getElementById('hide-listings').addEventListener('click', hideListings);
+  <!-- https://stackoverflow.com/questions/28274940/using-a-external-js-file-with-knockout-not-applying-bindings -->
+  <script
+          src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyBpgEZ4iexILdostcaViVlyZg8ebFc0ra8&v=3">
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+  			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  			  crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script type='text/javascript' src='js/knockout.js'></script>
+  <script src="js/app.js"></script>
 
-        document.getElementById('toggle-drawing').addEventListener('click', function() {
-          toggleDrawing(drawingManager);
-        });
-
-        document.getElementById('zoom-to-area').addEventListener('click', function() {
-          zoomToArea();
-        });
-
-        drawingManager.addListener('overlaycomplete', function(event) {
-          if (polygon) {
-            polygon.setMap(null);
-            hideListings(markers);
-          }
-          drawingManager.setDrawingMode(null);
-          polygon = event.overlay;
-          polygon.setEditable(true);
-          searchWithinPolygon();
-          polygon.getPath().addListener('set_at', searchWithinPolygon);
-          polygon.getPath().addListener('insert_at', searchWithinPolygon);
-        });
-
-        var rainbowDefaultIcon = makeMarkerIcon('ff0000');
-        var rainbowHighlightedIcon = makeMarkerIcon('FFFF24');
-        var rainbowMarker = new google.maps.Marker({
-          map: map,
-          position: centerLocation.location,
-          title: centerLocation.title,
-          animation: google.maps.Animation.DROP,
-          icon: rainbowDefaultIcon,
-        });
-        rainbowMarker.addListener('click', function() {
-          populateInfoWindow(this, largeInfowindow);
-        });
-        rainbowMarker.addListener('mouseover', function() {
-          this.setIcon(rainbowHighlightedIcon);
-        });
-        rainbowMarker.addListener('mouseout', function() {
-          this.setIcon(rainbowDefaultIcon);
-        });
-      }
-
-      function populateInfoWindow(marker, infowindow) {
-        if (infowindow.marker != marker) {
-          infowindow.marker = marker;
-          infowindow.setContent('');
-          // infowindow.open(map, marker);
-          infowindow.addListener('closeclick',function(){
-            infowindow.setMarker = null;
-          });
-          var streetViewService = new google.maps.StreetViewService();
-          var radius = 50;
-          function getStreetView(data, status) {
-            if (status == google.maps.StreetViewStatus.OK) {
-              var nearStreetViewLocation = data.location.latLng;
-              var heading = google.maps.geometry.spherical.computeHeading(
-                nearStreetViewLocation, marker.position);
-                // TODO: remove
-                console.log('title: ' + marker.title);
-                infowindow.setContent('<div>' + marker.title + '</div><div id="pano"></div>');
-                var panoramaOptions = {
-                  position: nearStreetViewLocation,
-                  pov: {
-                    heading: heading,
-                    pitch: 30
-                  }
-                };
-              var panorama = new google.maps.StreetViewPanorama(
-                document.getElementById('pano'), panoramaOptions);
-            } else {
-              infowindow.setContent('<div>' + marker.title + '</div>' +
-                '<div>No Street View Found</div>');
-            }
-          }
-          streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
-          infowindow.open(map, marker);
-        }
-      }
-
-      function showListings() {
-        var bounds = new google.maps.LatLngBounds();
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(map);
-          bounds.extend(markers[i].position);
-        }
-        map.fitBounds(bounds);
-      }
-
-      function hideListings() {
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(null);
-        }
-      }
-
-      function makeMarkerIcon(markerColor) {
-        var markerImage = new google.maps.MarkerImage(
-          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
-          '|40|_|%E2%80%A2',
-          new google.maps.Size(21, 34),
-          new google.maps.Point(0, 0),
-          new google.maps.Point(10, 34),
-          new google.maps.Size(21,34));
-        return markerImage;
-      }
-
-      function toggleDrawing(drawingManager) {
-        if (drawingManager.map) {
-          drawingManager.setMap(null);
-          if (polygon !== null) {
-            polygon.setMap(null);
-          }
-        } else {
-          drawingManager.setMap(map);
-        }
-      }
-
-      function searchWithinPolygon() {
-        for (var i = 0; i < markers.length; i++) {
-          if (google.maps.geometry.poly.containsLocation(markers[i].position, polygon)) {
-            markers[i].setMap(map);
-          } else {
-            markers[i].setMap(null);
-          }
-        }
-      }
-      function zoomToArea() {
-        // Initialize the geocoder.
-        var geocoder = new google.maps.Geocoder();
-        // Get the address or place that the user entered.
-        var address = document.getElementById('zoom-to-area-text').value;
-        // Make sure the address isn't blank.
-        if (address == '') {
-          window.alert('You must enter an area, or address.');
-        } else {
-          // Geocode the address/area entered to get the center. Then, center the map
-          // on it and zoom in
-          geocoder.geocode(
-            { address: address,
-              componentRestrictions: {locality: 'Cupertino'}
-            }, function(results, status) {
-              if (status == google.maps.GeocoderStatus.OK) {
-                map.setCenter(results[0].geometry.location);
-                map.setZoom(15);
-              } else {
-                window.alert('We could not find that location - try entering a more' +
-                    ' specific place.');
-              }
-            });
-        }
-      }
-    </script>
-    <script>
-    var ViewModel = function() {
-      self = this;
-      this.categories = ko.observableArray();
-      this.categories.push(new Category('schools', locations.schools));
-      this.categories.push(new Category('groceries', locations.groceries));
-      this.categories.push(new Category('parks', locations.parks));
-      console.log('categories: ' + this.categories());
-      this.selectedCategory = ko.observable();
-      console.log('category: ' + this.selectedCategory());
-    };
-    var Category = function(category, data) {
-      self = this;
-      self.category = category;
-      self.titles = ko.observableArray([]);
-      data.forEach(function(item) {
-        self.titles.push(item.title);
-      });
-    }
-    ko.applyBindings(new ViewModel());
-    </script>
-    <script async defer
-        src=
-        "https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyBpgEZ4iexILdostcaViVlyZg8ebFc0ra8&v=3&callback=initMap">
-    </script>
-
-  </body>
+</body>
 </html>
