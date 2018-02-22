@@ -1,4 +1,23 @@
 var map;
+var markers = [];
+
+var setMap = function(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+};
+
+var setNeighborhoodMarker = function(title, lat, lng) {
+  var infowindow = new google.maps.InfoWindow({
+    content: title
+  });
+  var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(lat, lng),
+    animation: google.maps.Animation.DROP
+  });
+  // TODO: addListener
+  return marker;
+};
 
 var locations = function() {};
 locations.schools = [
