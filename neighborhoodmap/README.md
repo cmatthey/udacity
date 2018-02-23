@@ -4,8 +4,8 @@ Udacity Project: Neighborhood Map
 How to load and view the App
 =============================
 To run the app just visit: http://cmatthey.github.io/neighborhoodmap <br>.
-Or it can be run locally by git clone http://github.com/cmatthey/neighborhoodmap.
-Use a browser to open index.html.
+Or it can be run locally by git clone  https://github.com/cmatthey/udacity.
+Use a browser to open https://github.com/cmatthey/udacity/tree/master/neighborhoodmap/index.html.
 Search near by schools, groceries, and parks in my neighborhood.
 
 
