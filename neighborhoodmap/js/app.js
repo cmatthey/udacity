@@ -15,7 +15,17 @@ var setNeighborhoodMarker = function(title, lat, lng) {
     position: new google.maps.LatLng(lat, lng),
     animation: google.maps.Animation.DROP
   });
-  // TODO: addListener
+  var infowindow = new google.maps.InfoWindow({
+    content: '<div>' + title + '</div>'
+  });
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.open(map, marker) + marker.setAnimation(google.maps.Animation.BOUNCE);
+    map.setCenter(marker.getPosition());
+  });
+  //If you leave the marker with the mouse it stops bouncing
+  google.maps.event.addListener(marker, 'mouseout', function() {
+    infowindow.close(map, marker) + marker.setAnimation(null);
+  });
   return marker;
 };
 
@@ -82,7 +92,18 @@ var ViewModel = function() {
   google.maps.event.addDomListener(window, 'load', initialize);
 
   this.showMarkers = function() {
-    console.log('in showMarkers');
+    var myCategory = $('#category option:selected').text();
+    var myLocations = locations[myCategory];
+    removeMarkers();
+    myLocations.forEach(function(item) {
+      var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
+      addMarkers(markerToBeAdded);
+    });
+    setMap(map);
+    console.log('markers.length: ' + markers.length);
+    markers.forEach(function(item) {
+      console.log('title: ' + item.title);
+    });
   };
 };
 
@@ -109,15 +130,6 @@ var POI = function(title, lat, lng) {
       position: new google.maps.LatLng(lat, lng),
       animation: google.maps.Animation.DROP
     });
-    var myCategory = $('#category option:selected').text();
-    var myLocations = locations[myCategory];
-    removeMarkers();
-    myLocations.forEach(function(item) {
-      var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
-      addMarkers(markerToBeAdded);
-    });
-    setMap(map);
-    console.log('markers.length: ' + markers.length);
   }
 };
 
