@@ -8,11 +8,9 @@ var setMap = function(map) {
 };
 
 var setNeighborhoodMarker = function(title, lat, lng) {
-  var infowindow = new google.maps.InfoWindow({
-    content: title
-  });
   var marker = new google.maps.Marker({
     position: new google.maps.LatLng(lat, lng),
+    metadata : {title: title},
     animation: google.maps.Animation.DROP
   });
   var infowindow = new google.maps.InfoWindow({
@@ -59,16 +57,6 @@ locations.parks = [
 locations.all = locations.schools.concat(locations.groceries).concat(locations.parks);
 var centerLatLng = {lat: 37.3083685, lng: -122.0316045};
 var centerLocation = {title: 'Center', location: {lat: 37.3083685, lng: -122.0316045}};
-var initMap = function() {
-  var lat = 37.3083685;
-  var lng = -122.0316045;
-  latlng = new google.maps.LatLng(lat, lng);
-  var mapOptions = {
-    zoom: 13,
-    center: latlng
-  };
-  map = new google.maps.Map(document.getElementById('map'), mapOptions);
-};
 
 var ViewModel = function() {
   self = this;
@@ -78,6 +66,21 @@ var ViewModel = function() {
   this.categories.push(new Category('groceries', locations.groceries));
   this.categories.push(new Category('parks', locations.parks));
   this.selectedCategory = ko.observable();
+
+  this.showMarkers = function() {
+    var myLocations = locations.all;
+    var myCategory = $('#category option:selected').text();
+    if (myCategory) {
+      myLocations = locations[myCategory];
+    }
+    removeMarkers();
+    myLocations.forEach(function(item) {
+      var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
+      addMarkers(markerToBeAdded);
+    });
+    setMap(map);
+    console.log('run showMarkers' + myLocations.length);
+  };
 
   var initialize = function() {
     var lat = 37.3083685;
@@ -91,20 +94,7 @@ var ViewModel = function() {
   };
   google.maps.event.addDomListener(window, 'load', initialize);
 
-  this.showMarkers = function() {
-    var myCategory = $('#category option:selected').text();
-    var myLocations = locations[myCategory];
-    removeMarkers();
-    myLocations.forEach(function(item) {
-      var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
-      addMarkers(markerToBeAdded);
-    });
-    setMap(map);
-    console.log('markers.length: ' + markers.length);
-    markers.forEach(function(item) {
-      console.log('title: ' + item.title);
-    });
-  };
+  console.log('run initialize');
 };
 
 var Category = function(category, data) {
@@ -125,11 +115,15 @@ var POI = function(title, lat, lng) {
   this.lat = ko.observable(lat);
   this.lng = ko.observable(lng);
   this.show = function() {
-    var marker = new google.maps.Marker({
-      map: map,
-      position: new google.maps.LatLng(lat, lng),
-      animation: google.maps.Animation.DROP
+    markers.forEach(function(item){
+      if (title == item.metadata.title) {
+        console.log('title ' + title + 'metadata ' + item.metadata.title);
+        item.setAnimation(google.maps.Animation.BOUNCE);
+      } else {
+        item.setAnimation(null);
+      }
     });
+    console.log('in show');
   }
 };
 
