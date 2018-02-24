@@ -104,7 +104,7 @@ $(function() {
     describe('New Feed Selection', function() {
       beforeEach(function(done) {
         loadFeed(0, done);
-      })
+      });
       it('the content actually changes', function(done) {
         expect($('.feed').length).toBeGreaterThan(0);
         done();
