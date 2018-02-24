@@ -10,14 +10,14 @@ Open index.html and observe the tests in the bottom of the page.
 
 ## Test Coverage?
 
-###RSS Feeds
+### RSS Feeds
 are defined
 each Feed has a non-empty url
 each Feed has a non-empty name
-###The menu
+### The menu
 the menu element is hidden by default
 the menu displays when clicked and is hidden clicked again
-###Initial Entries
+### Initial Entries
 loadFeed function is called
-###New Feed Selection
+### New Feed Selection
 the content actually changes
