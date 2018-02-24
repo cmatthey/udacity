@@ -13,8 +13,9 @@ function loadData() {
     var IMGT = '<img class="bgimg" src="http://maps.googleapis.com/maps/api/streetview?size=600x300&location=%data%">';
     var imgStr = IMGT.replace('%data%', address);
 
-    var apiKey = '02e7f8b72b744aa1a4623d979c8d1290';
-    var nytUrl = "https://api.nytimes.com/svc/search/v2/articlesearch.json?" + $.param(
+    // var apiKey = '02e7f8b72b744aa1a4623d979c8d1290';
+    var apiKey = '090';
+    var nytUrl = "https://api.nytimesxxx.com/svc/search/v2/articlesearch.json?" + $.param(
       {'api-key': apiKey,
           'sort': 'newest',
           'q': cityStr}
@@ -48,9 +49,11 @@ function loadData() {
             replace('%pData%', article.snippet);
         $nytElem.append(articleStr);
       })
-      .fail(function(error) {
-        console.log("fail");
-      });
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      $nytHeaderElem.text('New York Times Articles could not be loaded');
+      console.log("error: " + textStatus);
+      console.log("incoming Text: " + jqXHR.responseText);
     });
 
     return false;
