@@ -103,11 +103,13 @@ $(function() {
          * Remember, loadFeed() is asynchronous.
          */
     describe('New Feed Selection', function() {
+      var feedElement = $('.feed');
+      var feedBefore = feedElement.text();
       beforeEach(function(done) {
         loadFeed(1, done);
       });
       it('the content actually changes', function(done) {
-        expect($('.feed').length).toBeGreaterThan(0);
+        expect(feedElement.text()).not.toBe(feedBefore);
         done();
       });
     });
