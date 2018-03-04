@@ -1,10 +1,10 @@
 var map;
-var markers = [];
+var markers = {};
 
 var setMap = function(map) {
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(map);
-  }
+  Object.keys(markers).forEach(function(key){
+    markers[key].setMap(map);
+  });
 };
 
 var setNeighborhoodMarker = function(title, lat, lng) {
@@ -14,26 +14,25 @@ var setNeighborhoodMarker = function(title, lat, lng) {
     animation: google.maps.Animation.DROP
   });
   var infowindow = new google.maps.InfoWindow({
-    content: '<div>' + title + '</div>'
+    content: '<div>' + marker.metadata.title + '</div>'
   });
   google.maps.event.addListener(marker, 'click', function() {
-    infowindow.open(map, marker) + marker.setAnimation(google.maps.Animation.BOUNCE);
     map.setCenter(marker.getPosition());
+    infowindow.open(map, marker) + marker.setAnimation(google.maps.Animation.BOUNCE);
   });
-  //If you leave the marker with the mouse it stops bouncing
-  google.maps.event.addListener(marker, 'mouseout', function() {
-    infowindow.close(map, marker) + marker.setAnimation(null);
+  google.maps.event.addListener(map, 'center_changed', function() {
+    marker.setAnimation(null);
   });
   return marker;
 };
 
 var addMarkers = function(marker) {
-  markers.push(marker);
+  markers[marker.metadata.title] = marker;
 };
 
 var removeMarkers = function() {
   setMap(null);
-  markers = [];
+  markers = {};
 };
 
 var locations = function() {};
@@ -79,7 +78,6 @@ var ViewModel = function() {
       addMarkers(markerToBeAdded);
     });
     setMap(map);
-    console.log('run showMarkers' + myLocations.length);
   };
 
   var initialize = function() {
@@ -91,6 +89,12 @@ var ViewModel = function() {
       center: latlng
     };
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    // Setting initial Markers
+    locations.all.forEach(function(item) {
+    var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
+      addMarkers(markerToBeAdded);
+    });
+    setMap(map);
   };
   google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -115,16 +119,76 @@ var POI = function(title, lat, lng) {
   this.lat = ko.observable(lat);
   this.lng = ko.observable(lng);
   this.show = function() {
-    markers.forEach(function(item){
-      if (title == item.metadata.title) {
-        console.log('title ' + title + 'metadata ' + item.metadata.title);
+    Object.keys(markers).forEach(function(key){
+      if (title == markers[key].metadata.title) {
+        console.log('title ' + title + 'metadata ' + marker[key].metadata.title);
         item.setAnimation(google.maps.Animation.BOUNCE);
       } else {
         item.setAnimation(null);
       }
     });
-    console.log('in show');
   }
 };
+
+var yelpapi = function(terms, location) {
+  var auth = {
+    consumerKey: "WaEtHKEo4ZZd4eDcOWnTWA",
+    consumerSecret: "8eEcMiXq3m2LJp1tQQFkSSS2Avw",
+    accessToken: "J-rfdsYzCK0IPwNAfiHScUmMkIT6V_lH",
+    accessTokenSecret: "T46e74WAJo-6GkC6Od7w8ftt4MQ",
+    serviceProvider: {
+      signatureMethod: "HMAC-SHA1"
+    }
+  };
+  var accessor = {
+    consumerSecret: auth.consumerSecret,
+    tokenSecret: auth.accessTokenSecret
+  };
+  var parameters = [];
+  parameters.push(['term', terms]);
+  parameters.push(['location', location]);
+  parameters.push(['callback', 'cb']);
+  parameters.push(['oauth_consumer_key', auth.consumerKey]);
+  parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
+  parameters.push(['oauth_token', auth.accessToken]);
+  parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
+  var message = {
+    'action': 'http://api.yelp.com/v2/search',
+    'method': 'GET',
+    'parameters': parameters
+  };
+  OAuth.setTimestampAndNonce(message);
+  OAuth.SignatureMethod.sign(message, accessor);
+  var parameterMap = OAuth.getParameterMap(message.parameters);
+  $.ajax({
+    'url': message.action,
+    'data': parameterMap,
+    'cached': true,
+    'dataType': 'jsonp',
+    'jsonpCallback': 'cb',
+    'success': function(data, textStats, XMLHttpRequest) {
+      removeMarkers();
+      self.listings.removeAll();
+      console.log(data);
+      var len = data.businesses.length;
+      for (var i = 0; i < len; i++) {
+        self.listings.push(new ListElements(data.businesses[i]));
+      }
+      console.log(self.listings());
+      showMarkers();
+    }
+  }).fail(function(e) {
+    console.log('Opps the Burger Map turned the wrong way.');
+    console.log(e.error());
+  });
+};
+
+var yelpsearchapi = function() {
+
+};
+
+$.ajaxSetup({
+  'cache': true
+});
 
 ko.applyBindings(new ViewModel());
