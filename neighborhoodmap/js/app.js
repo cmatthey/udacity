@@ -17,6 +17,7 @@ var setNeighborhoodMarker = function(title, lat, lng) {
     content: '<div>' + marker.metadata.title + '</div>'
   });
   google.maps.event.addListener(marker, 'click', function() {
+    yelpfusionapi(title);
     map.setCenter(marker.getPosition());
     infowindow.open(map, marker) + marker.setAnimation(google.maps.Animation.BOUNCE);
   });
@@ -91,9 +92,9 @@ var ViewModel = function() {
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     // Setting initial Markers
     locations.all.forEach(function(item) {
-    var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
-      addMarkers(markerToBeAdded);
-    });
+      var markerToBeAdded = setNeighborhoodMarker(item.title, item.location.lat, item.location.lng);
+        addMarkers(markerToBeAdded);
+      });
     setMap(map);
   };
   google.maps.event.addDomListener(window, 'load', initialize);
@@ -121,71 +122,98 @@ var POI = function(title, lat, lng) {
   this.show = function() {
     Object.keys(markers).forEach(function(key){
       if (title == markers[key].metadata.title) {
-        console.log('title ' + title + 'metadata ' + marker[key].metadata.title);
-        item.setAnimation(google.maps.Animation.BOUNCE);
+        console.log('title ' + title + 'metadata ' + markers[key].metadata.title);
+        markers[key].setAnimation(google.maps.Animation.BOUNCE);
       } else {
-        item.setAnimation(null);
+        markers[key].setAnimation(null);
       }
     });
   }
 };
 
-var yelpapi = function(terms, location) {
-  var auth = {
-    consumerKey: "WaEtHKEo4ZZd4eDcOWnTWA",
-    consumerSecret: "8eEcMiXq3m2LJp1tQQFkSSS2Avw",
-    accessToken: "J-rfdsYzCK0IPwNAfiHScUmMkIT6V_lH",
-    accessTokenSecret: "T46e74WAJo-6GkC6Od7w8ftt4MQ",
-    serviceProvider: {
-      signatureMethod: "HMAC-SHA1"
-    }
-  };
-  var accessor = {
-    consumerSecret: auth.consumerSecret,
-    tokenSecret: auth.accessTokenSecret
-  };
-  var parameters = [];
-  parameters.push(['term', terms]);
-  parameters.push(['location', location]);
-  parameters.push(['callback', 'cb']);
-  parameters.push(['oauth_consumer_key', auth.consumerKey]);
-  parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
-  parameters.push(['oauth_token', auth.accessToken]);
-  parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
-  var message = {
-    'action': 'http://api.yelp.com/v2/search',
-    'method': 'GET',
-    'parameters': parameters
-  };
-  OAuth.setTimestampAndNonce(message);
-  OAuth.SignatureMethod.sign(message, accessor);
-  var parameterMap = OAuth.getParameterMap(message.parameters);
-  $.ajax({
-    'url': message.action,
-    'data': parameterMap,
-    'cached': true,
-    'dataType': 'jsonp',
-    'jsonpCallback': 'cb',
-    'success': function(data, textStats, XMLHttpRequest) {
-      removeMarkers();
-      self.listings.removeAll();
-      console.log(data);
-      var len = data.businesses.length;
-      for (var i = 0; i < len; i++) {
-        self.listings.push(new ListElements(data.businesses[i]));
+var CLIENT_ID = '534942046014-6ar5r7rf1upb42vvi8c2uq684c5ccn1g.apps.googleusercontent.com';
+var API_KEY = 'AIzaSyBxReswLQlZaQwi0NIQeZ35mPTRniIMfdE';
+var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+var authorizeButton = document.getElementById('authorize-button');
+var signoutButton = document.getElementById('signout-button');
+
+function handleClientLoad() {
+  gapi.load('client:auth2', initClient);
+}
+
+function initClient() {
+ gapi.client.init({
+   apiKey: API_KEY,
+   clientId: CLIENT_ID,
+   discoveryDocs: DISCOVERY_DOCS,
+   scope: SCOPES
+ }).then(function () {
+   gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+   updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+   authorizeButton.onclick = handleAuthClick;
+   signoutButton.onclick = handleSignoutClick;
+ });
+}
+
+function updateSigninStatus(isSignedIn) {
+ if (isSignedIn) {
+   authorizeButton.style.display = 'none';
+   signoutButton.style.display = 'block';
+   getStars();
+ } else {
+   authorizeButton.style.display = 'block';
+   signoutButton.style.display = 'none';
+ }
+}
+
+function handleAuthClick(event) {
+ gapi.auth2.getAuthInstance().signIn();
+}
+
+function handleSignoutClick(event) {
+ gapi.auth2.getAuthInstance().signOut();
+}
+
+function getStars() {
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: '12VUUhUfh5m9D07C81lng48W63XLMGk80TgKnXIlPdkU',
+    range: 'Star Data!A1:B11',
+  }).then(function(response) {
+    var range = response.result;
+    if (range.values.length > 0) {
+      console.log('range.values.length:' + range.values.length);
+      for (i = 0; i < range.values.length; i++) {
+        var row = range.values[i];
+        // Print columns A and E, which correspond to indices 0 and 4.
+        console.log(row[0] + ', ' + row[1]);
       }
-      console.log(self.listings());
-      showMarkers();
+    } else {
+      console.log('No data found.');
     }
-  }).fail(function(e) {
-    console.log('Opps the Burger Map turned the wrong way.');
-    console.log(e.error());
+  }, function(response) {
+    console.log('Error: ' + response.result.error.message);
   });
-};
+}
 
-var yelpsearchapi = function() {
-
-};
+// var yelpfusionapi = function(title) {
+//   $.ajax({
+//     'url': 'http://api.yelp.com/v3/businesses/search?location=cupertino&term=' + title.replace(' ', '-'),
+//     'type': 'GET',
+//     'cached': true,
+//     'dataType': 'jsonp',
+//     'beforeSend': function(request) {
+//     request.setRequestHeader("Authorization", 'Bearer rHe09HCWMdvjVVL0J6pNOD-Kq2qFY3-25ug1r1qBC1zJ9sy6YOnOZEescdALflvX0ngJwamZO4yFaeVeM9WBEzkFZl5EY47kyE32vghDhMl9ny0ykmDTWxGnSBebWnYx');
+//     },
+//     'headers': {'Authorization': 'Bearer rHe09HCWMdvjVVL0J6pNOD-Kq2qFY3-25ug1r1qBC1zJ9sy6YOnOZEescdALflvX0ngJwamZO4yFaeVeM9WBEzkFZl5EY47kyE32vghDhMl9ny0ykmDTWxGnSBebWnYx'},
+//     'jsonpCallback': 'cb',
+//     'success': function(data, textStats, XMLHttpRequest) {
+//       console.log('yelp success');
+//     }
+//   }).fail(function(e) {
+//     console.log(function(e) {e.error()});
+//   });
+// };
 
 $.ajaxSetup({
   'cache': true
