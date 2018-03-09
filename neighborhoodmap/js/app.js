@@ -1,5 +1,6 @@
 var map;
 var markers = {};
+var info = {};
 
 var setMap = function(map) {
   Object.keys(markers).forEach(function(key){
@@ -14,10 +15,9 @@ var setNeighborhoodMarker = function(title, lat, lng) {
     animation: google.maps.Animation.DROP
   });
   var infowindow = new google.maps.InfoWindow({
-    content: '<div>' + marker.metadata.title + '</div>'
+    content: '<div>' + marker.metadata.title + ' ' + info + '</div>'
   });
   google.maps.event.addListener(marker, 'click', function() {
-    yelpfusionapi(title);
     map.setCenter(marker.getPosition());
     infowindow.open(map, marker) + marker.setAnimation(google.maps.Animation.BOUNCE);
   });
@@ -182,11 +182,11 @@ function getStars() {
   }).then(function(response) {
     var range = response.result;
     if (range.values.length > 0) {
-      console.log('range.values.length:' + range.values.length);
       for (i = 0; i < range.values.length; i++) {
         var row = range.values[i];
         // Print columns A and E, which correspond to indices 0 and 4.
-        console.log(row[0] + ', ' + row[1]);
+        info[row[0]] = row[1];
+        // console.log(row[0] + ', ' + row[1]);
       }
     } else {
       console.log('No data found.');

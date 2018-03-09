@@ -5,9 +5,13 @@ How to load and view the App
 =============================
 To run the app just visit: http://cmatthey.github.io/neighborhoodmap <br>.
 Or it can be run locally by git clone  https://github.com/cmatthey/udacity.
-Use a browser to open https://github.com/cmatthey/udacity/tree/master/neighborhoodmap/index.html.
+Set up a local server with the following command
+Python 3:
+python -m http.server 8080
+Python 2:
+python -m SimpleHTTPServer 8080
+Use a browser to open https://localhost:8000/cmatthey/udacity/tree/master/neighborhoodmap/index.html.
 Search near by schools, groceries, and parks in my neighborhood.
-
 
 
 What the project is about

@@ -15,6 +15,11 @@
   <!-- <div class="container"> -->
     <!-- <div class="row">
       <div class=".col-md-3"> -->
+      <header>
+
+      </header>
+      <main>
+        <article>
         <select data-bind="options: categories, optionsText: 'category', value: selectedCategory, event: {change: showMarkers}" id="category"></select>
         <div data-bind="with: selectedCategory">
           <div data-bind="text: 'category'"></div>
@@ -28,13 +33,17 @@
           <button id="authorize-button" style="display: none;">Authorize</button>
           <button id="signout-button" style="display: none;">Sign Out</button>
         </div>
+        </article>
       <!-- </div> -->
-      <div id="map"></div>
+      <article>
+        <div id="map"></div>
+      </article>
+      </main>
     <!-- </div> -->
   <!-- </div> -->
 
   <!-- https://stackoverflow.com/questions/28274940/using-a-external-js-file-with-knockout-not-applying-bindings -->
-  <script
+  <script async
           src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyBpgEZ4iexILdostcaViVlyZg8ebFc0ra8&v=3">
   </script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
