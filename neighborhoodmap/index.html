@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<head
   <title>My neighorhood</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -11,15 +11,15 @@
   <link rel="stylesheet" href="css/main.css">
 </head>
 
-<body>
-  <!-- <div class="container"> -->
+<body>>
+  <div class="container-fluid">
     <!-- <div class="row">
       <div class=".col-md-3"> -->
       <header>
 
       </header>
       <main>
-        <article>
+        <article id='poi'>
         <select data-bind="options: categories, optionsText: 'category', value: selectedCategory, event: {change: showMarkers}" id="category"></select>
         <div data-bind="with: selectedCategory">
           <div data-bind="text: 'category'"></div>
@@ -36,14 +36,14 @@
         </article>
       <!-- </div> -->
       <article>
-        <div id="map"></div>
+        <div id="map" class='main col-md-11 col-md-offset-2'></div>
       </article>
       </main>
     <!-- </div> -->
-  <!-- </div> -->
+  </div>
 
   <!-- https://stackoverflow.com/questions/28274940/using-a-external-js-file-with-knockout-not-applying-bindings -->
-  <script async
+  <script
           src="https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyBpgEZ4iexILdostcaViVlyZg8ebFc0ra8&v=3">
   </script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
