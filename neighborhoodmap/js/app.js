@@ -1,6 +1,7 @@
 var map;
 var markers = {};
 var info = {};
+var trafficData;
 
 var setMap = function(map) {
   Object.keys(markers).forEach(function(key){
@@ -9,16 +10,18 @@ var setMap = function(map) {
 };
 
 var setNeighborhoodMarker = function(title, lat, lng) {
+  callmapquestapi(lat, lng);
   var marker = new google.maps.Marker({
     position: new google.maps.LatLng(lat, lng),
     metadata : {title: title},
     animation: google.maps.Animation.DROP
   });
   var infowindow = new google.maps.InfoWindow({
-    content: '<div>' + marker.metadata.title + ' ' + info + '</div>'
+    content: '<div>' + marker.metadata.title + ' ' + trafficData  + '</div>'
   });
   google.maps.event.addListener(marker, 'click', function() {
     map.setCenter(marker.getPosition());
+    infowindow.setContent('<div>' + marker.metadata.title + ' ' + trafficData  + '</div>');
     infowindow.open(map, marker) + marker.setAnimation(google.maps.Animation.BOUNCE);
   });
   google.maps.event.addListener(map, 'center_changed', function() {
@@ -98,8 +101,6 @@ var ViewModel = function() {
     setMap(map);
   };
   google.maps.event.addDomListener(window, 'load', initialize);
-
-  console.log('run initialize');
 };
 
 var Category = function(category, data) {
@@ -130,90 +131,24 @@ var POI = function(title, lat, lng) {
     });
   }
 };
-
-var CLIENT_ID = '534942046014-6ar5r7rf1upb42vvi8c2uq684c5ccn1g.apps.googleusercontent.com';
-var API_KEY = 'AIzaSyBxReswLQlZaQwi0NIQeZ35mPTRniIMfdE';
-var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
-var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
-var authorizeButton = document.getElementById('authorize-button');
-var signoutButton = document.getElementById('signout-button');
-
-function handleClientLoad() {
-  gapi.load('client:auth2', initClient);
-}
-
-function initClient() {
- gapi.client.init({
-   apiKey: API_KEY,
-   clientId: CLIENT_ID,
-   discoveryDocs: DISCOVERY_DOCS,
-   scope: SCOPES
- }).then(function () {
-   gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-   updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-   authorizeButton.onclick = handleAuthClick;
-   signoutButton.onclick = handleSignoutClick;
- });
-}
-
-function updateSigninStatus(isSignedIn) {
- if (isSignedIn) {
-   authorizeButton.style.display = 'none';
-   signoutButton.style.display = 'block';
-   getStars();
- } else {
-   authorizeButton.style.display = 'block';
-   signoutButton.style.display = 'none';
- }
-}
-
-function handleAuthClick(event) {
- gapi.auth2.getAuthInstance().signIn();
-}
-
-function handleSignoutClick(event) {
- gapi.auth2.getAuthInstance().signOut();
-}
-
-function getStars() {
-  gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: '12VUUhUfh5m9D07C81lng48W63XLMGk80TgKnXIlPdkU',
-    range: 'Star Data!A1:B11',
-  }).then(function(response) {
-    var range = response.result;
-    if (range.values.length > 0) {
-      for (i = 0; i < range.values.length; i++) {
-        var row = range.values[i];
-        // Print columns A and E, which correspond to indices 0 and 4.
-        info[row[0]] = row[1];
-        // console.log(row[0] + ', ' + row[1]);
-      }
+var callmapquestapi = function(lat, lng) {
+  var MAPQUEST_KEY = '9D2Z2jPEHDwUTp0Lc2kqQUPXb0rSbfxG';
+  var bindingbox = lat + ',' + lng + ','
+                 + (parseFloat(lat) + 1) + ',' + (parseFloat(lng) + 1);
+  var url = 'https://www.mapquestapi.com/traffic/v2/incidents?outFormat=json&boundingBox=' + bindingbox + '&key=' + MAPQUEST_KEY;
+  $.getJSON(url, function(data) {
+    var incidents = data.incidents;
+    var myTrafficData;
+    if (incidents.length > 0) {
+      myTrafficData = incidents[0].fullDesc;
     } else {
-      console.log('No data found.');
+      myTrafficData = '';
     }
-  }, function(response) {
-    console.log('Error: ' + response.result.error.message);
+    console.log('trafficData '+ myTrafficData);
+    // Traffic data does not pass to InfoWindow
+    trafficData = myTrafficData;
   });
-}
-
-// var yelpfusionapi = function(title) {
-//   $.ajax({
-//     'url': 'http://api.yelp.com/v3/businesses/search?location=cupertino&term=' + title.replace(' ', '-'),
-//     'type': 'GET',
-//     'cached': true,
-//     'dataType': 'jsonp',
-//     'beforeSend': function(request) {
-//     request.setRequestHeader("Authorization", 'Bearer rHe09HCWMdvjVVL0J6pNOD-Kq2qFY3-25ug1r1qBC1zJ9sy6YOnOZEescdALflvX0ngJwamZO4yFaeVeM9WBEzkFZl5EY47kyE32vghDhMl9ny0ykmDTWxGnSBebWnYx');
-//     },
-//     'headers': {'Authorization': 'Bearer rHe09HCWMdvjVVL0J6pNOD-Kq2qFY3-25ug1r1qBC1zJ9sy6YOnOZEescdALflvX0ngJwamZO4yFaeVeM9WBEzkFZl5EY47kyE32vghDhMl9ny0ykmDTWxGnSBebWnYx'},
-//     'jsonpCallback': 'cb',
-//     'success': function(data, textStats, XMLHttpRequest) {
-//       console.log('yelp success');
-//     }
-//   }).fail(function(e) {
-//     console.log(function(e) {e.error()});
-//   });
-// };
+};
 
 $.ajaxSetup({
   'cache': true
