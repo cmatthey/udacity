@@ -39,24 +39,24 @@ var removeMarkers = function() {
   markers = {};
 };
 
-var locations = function() {};
-locations.schools = [
-  {title: 'R.I. Meyerholz Elementary School', location: {lat: 37.3064996, lng: -122.0286182}},
-  {title: 'Eaton Elementary School', location: {lat: 37.3150976, lng: -122.0283705}},
-  {title: 'John Muir Elementary School', location: {lat: 37.2999103, lng: -122.0547888}},
-  {title: 'William Faria Elementary School', location: {lat: 37.3166988, lng: -122.0353406}},
-  {title: 'Nelson S. Dilworth Elementary School', location: {lat: 37.3064309, lng: -122.0102763}},
-  {title: 'Sedgwick Elementary School', location: {lat: 37.3154064, lng: -122.0107286}}
-];
-locations.groceries = [
-  {title: 'Trader Joe\'s', location: {lat: 37.3220587, lng: -122.1035739}},
-  {title: '99 Range Market', location: {lat: 37.32191, lng: -122.0510434}},
-  {title: 'Sprouts farmers market', location: {lat: 37.3218729, lng: -122.0357225}}
-];
-locations.parks = [
-  {title: 'Jollyman Park', location: {lat: 37.3102855, lng: -122.0418191}},
-  {title: 'Wilson Park', location: {lat: 37.3190182, lng: -122.0223567}}
-];
+// var locations = function() {};
+// locations.schools = [
+//   {title: 'R.I. Meyerholz Elementary School', location: {lat: 37.3064996, lng: -122.0286182}},
+//   {title: 'Eaton Elementary School', location: {lat: 37.3150976, lng: -122.0283705}},
+//   {title: 'John Muir Elementary School', location: {lat: 37.2999103, lng: -122.0547888}},
+//   {title: 'William Faria Elementary School', location: {lat: 37.3166988, lng: -122.0353406}},
+//   {title: 'Nelson S. Dilworth Elementary School', location: {lat: 37.3064309, lng: -122.0102763}},
+//   {title: 'Sedgwick Elementary School', location: {lat: 37.3154064, lng: -122.0107286}}
+// ];
+// locations.groceries = [
+//   {title: 'Trader Joe\'s', location: {lat: 37.3220587, lng: -122.1035739}},
+//   {title: '99 Range Market', location: {lat: 37.32191, lng: -122.0510434}},
+//   {title: 'Sprouts farmers market', location: {lat: 37.3218729, lng: -122.0357225}}
+// ];
+// locations.parks = [
+//   {title: 'Jollyman Park', location: {lat: 37.3102855, lng: -122.0418191}},
+//   {title: 'Wilson Park', location: {lat: 37.3190182, lng: -122.0223567}}
+// ];
 locations.all = locations.schools.concat(locations.groceries).concat(locations.parks);
 var centerLatLng = {lat: 37.3083685, lng: -122.0316045};
 var centerLocation = {title: 'Center', location: {lat: 37.3083685, lng: -122.0316045}};
